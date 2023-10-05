@@ -8,6 +8,10 @@ import AuthLayout from "./layouts/AuthLayout";
 import GuestLayout from "./layouts/GuestLayout";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ProductEdit from "./pages/ProductEdit";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import AddProduct from "./pages/AddProduct";
 
 function App() {
   const { user, logout } = useContext(AuthContext);
@@ -17,6 +21,8 @@ function App() {
       <Routes>
         <Route element={<AuthLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/products/addproduct" element={<AddProduct />} />
+          <Route path="/products/:id/edit" element={<ProductEdit />} />
         </Route>
         <Route element={<GuestLayout />}>
           <Route path="/login" element={<Login />} />
@@ -25,6 +31,7 @@ function App() {
           <Route path="/password-reset/:token" element={<ResetPassword />} />
         </Route>
       </Routes>
+      <ToastContainer position="bottom-center" />
     </div>
   );
 }

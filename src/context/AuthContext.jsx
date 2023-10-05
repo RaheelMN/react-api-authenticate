@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [errors, setErrors] = useState([]);
+  const [products, setProducts] = useState([]);
 
   useEffect(()=>{
     getUser();
@@ -68,6 +69,20 @@ export const AuthProvider = ({ children }) => {
     }
   };  
 
-  return <AuthContext.Provider value={{user,errors,csrf,setErrors,getUser,login,logout,register}}>{children}</AuthContext.Provider>;
+  const getProductsList = async () => {
+    try {
+      const response = await axios.get("/api/products");
+      // const response = await axios.put(`/api/products/20`, {name:'raheel',description:'hello',price:'100'});
+      if (response.data) {
+        setProducts(response.data);
+        setIsData(true);
+        console.log(products);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };  
+
+  return <AuthContext.Provider value={{user,errors,csrf,setErrors,getUser,login,logout,register,getProductsList}}>{children}</AuthContext.Provider>;
 };
 export default AuthContext;
