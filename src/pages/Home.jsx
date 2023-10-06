@@ -7,25 +7,11 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const Home = () => {
-  const { user } = useContext(AuthContext);
-  const [products, setProducts] = useState([]);
-  const [isData, setIsData] = useState(false);
+  const { user,products,getProductsList,isData } = useContext(AuthContext);
   const url = "http://localhost:8000/";
 
-  const getProducts = async () => {
-    try {
-      const response = await axios.get("/api/products");
-      if (response.data) {
-        setProducts(response.data);
-        setIsData(true);
-        console.log(products);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
-    getProducts();
+    getProductsList();
   }, []);
 
   const productDelete = async (id) => {

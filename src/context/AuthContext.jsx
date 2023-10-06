@@ -9,28 +9,31 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState([]);
   const [products, setProducts] = useState([]);
+  const [totalproducts, setTotalProducts] = useState([]);
+  const [key, setKey] = useState("");
+  const [isData,setIsData]=useState(false)
 
-  useEffect(()=>{
+  useEffect(() => {
     getUser();
-  },[])
+  }, []);
 
   const csrf = () => axios.get("/sanctum/csrf-cookie");
   const getUser = async () => {
-    try {      
+    try {
       const { data } = await axios.get("/api/user");
       setUser(data);
     } catch (error) {
-      if(error.response.status===401){
+      if (error.response.status === 401) {
         console.log(error.response.data.message);
       }
     }
   };
 
-  const login = async ({ ...data}) => {
+  const login = async ({ ...data }) => {
     await csrf();
     try {
       await axios.post("/login", data);
-      await getUser()
+      await getUser();
       navigate("/");
     } catch (error) {
       if (error.response.status === 422) {
@@ -43,23 +46,23 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await axios.post("/logout");
-      setUser(null)
+      setUser(null);
       navigate("/");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
-  const register = async ({name,email,password,password_confirmation}) => {
-    await csrf()
+  const register = async ({ name, email, password, password_confirmation }) => {
+    await csrf();
     try {
       await axios.post("/register", {
         name,
         email,
         password,
-        password_confirmation
+        password_confirmation,
       });
-      await getUser()
+      await getUser();
       navigate("/");
     } catch (error) {
       if (error.response.status === 422) {
@@ -67,22 +70,61 @@ export const AuthProvider = ({ children }) => {
         setErrors(error.response.data.errors);
       }
     }
-  };  
+  };
+
 
   const getProductsList = async () => {
     try {
       const response = await axios.get("/api/products");
-      // const response = await axios.put(`/api/products/20`, {name:'raheel',description:'hello',price:'100'});
       if (response.data) {
         setProducts(response.data);
+        setTotalProducts(response.data)
         setIsData(true);
-        console.log(products);
+        console.log(totalproducts);
       }
     } catch (error) {
       console.log(error);
     }
-  };  
+  };
 
-  return <AuthContext.Provider value={{user,errors,csrf,setErrors,getUser,login,logout,register,getProductsList}}>{children}</AuthContext.Provider>;
+  const searchProducts = async (searchTerm) => {
+    if (searchTerm !== "") {
+      try {
+        const response = await axios.get(`/api/searchproducts/${searchTerm}`);
+        if (response.data.length > 0) {
+          setProducts(response.data);
+          console.log(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }else{
+      setProducts([...totalproducts])
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        errors,
+        csrf,
+        setErrors,
+        getUser,
+        login,
+        logout,
+        register,
+        getProductsList,
+        key,
+        setKey,
+        setProducts,
+        products,
+        searchProducts,
+        isData,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 export default AuthContext;

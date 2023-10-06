@@ -6,3 +6,10 @@
     color:red;
     font-size: 14px;
 }
+
+.search-input{
+   outline:none;
+   border:0px solid;
+   background-color: transparent; 
+   color:black;
+}
