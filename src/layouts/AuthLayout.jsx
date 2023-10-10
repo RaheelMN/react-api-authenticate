@@ -23,7 +23,7 @@ const AuthLayout = () => {
             <AiOutlineSearch className="text-gray-700" />
             <input
               onChange={(e) => {
-                searchProducts(e.target.value);
+                searchProducts(e.target.value,1);
                 setKey(e.target.value);
               }}
               className="search-input"

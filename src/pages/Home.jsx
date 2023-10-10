@@ -7,11 +7,28 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const Home = () => {
-  const { user,products,getProductsList,isData } = useContext(AuthContext);
+  const {
+    user,
+    products,
+    getProductsList,
+    isData,
+    current_page,
+    last_page,
+    per_page,
+    data,
+    total,
+    isSearch,
+    searchTerm,
+    searchProducts
+  } = useContext(AuthContext);
   const url = "http://localhost:8000/";
+  const pages = Array(last_page);
+  const page_start = (current_page - 1) * per_page;
+  pages.fill(1);
+  // console.log(pages);
 
   useEffect(() => {
-    getProductsList();
+    getProductsList(1);
   }, []);
 
   const productDelete = async (id) => {
@@ -24,6 +41,9 @@ export const Home = () => {
     }
   };
 
+  const hello = (i) => {
+    alert("hello: " + i);
+  };
   return (
     <div className="w-[80%] m-auto mt-10">
       <div className="relative overflow-x-auto">
@@ -31,9 +51,9 @@ export const Home = () => {
           <>
             <div className="flex justify-end">
               <Link to="/products/addproduct">
-              <button className="text-white bg-blue-800 rounded-md px-5 py-1 border-none">
-                Add Product
-              </button>
+                <button className="text-white bg-blue-800 rounded-md px-5 py-1 border-none">
+                  Add Product
+                </button>
               </Link>
             </div>
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -70,7 +90,7 @@ export const Home = () => {
                           scope="row"
                           className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          {i + 1}
+                          {page_start+i + 1}
                         </th>
                         <td className="px-6 py-4">{product.name}</td>
                         <td className="px-6 py-4">{product.description}</td>
@@ -102,6 +122,47 @@ export const Home = () => {
                   : null}
               </tbody>
             </table>
+            <div>
+              <ul className="flex justify-center items-center gap-2 mt-2">
+                {pages.map((page, i) =>
+                  current_page === i + 1 ? (
+                    <li
+                      key={i + 1}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        getProductsList(i + 1);
+                      }}
+                      className="bg-green-400
+                    py-1 px-3 
+                    border-none
+                     text-white rounded-md
+                     cursor-pointer"
+                    >
+                      {i + 1}
+                    </li>
+                  ) : (
+                    <li
+                      key={i + 1}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if(isSearch){
+                          searchProducts(searchTerm,i+1);
+                        }else{
+                          getProductsList(i + 1);
+                        }
+                      }}
+                      className="bg-green-800
+                    py-1 px-3 
+                    border-none
+                     text-white rounded-md
+                     cursor-pointer"
+                    >
+                      {i + 1}
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
           </>
         ) : (
           <div className="text-center">No data</div>

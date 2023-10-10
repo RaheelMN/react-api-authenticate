@@ -12,7 +12,12 @@ export const AuthProvider = ({ children }) => {
   const [totalproducts, setTotalProducts] = useState([]);
   const [key, setKey] = useState("");
   const [isData,setIsData]=useState(false)
-
+  const [current_page,setCurrentPage]=useState('')
+  const [last_page,setLastPage]=useState('')
+  const [per_page,setper_page]=useState('')
+  const [total,settotal_page]=useState('')
+  const [isSearch,setIsSearch]=useState(false)
+  const [searchTerm,setSearchTerm]=useState('')
   useEffect(() => {
     getUser();
   }, []);
@@ -73,33 +78,52 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const getProductsList = async () => {
+  const getProductsList = async (pagenumber) => {
+    setIsSearch(false)
     try {
-      const response = await axios.get("/api/products");
-      if (response.data) {
-        setProducts(response.data);
-        setTotalProducts(response.data)
+      const response = await axios.get(`/api/products?page=${pagenumber}`);
+      if (response.data.data) {
+        const page = response.data
+        setCurrentPage(page.current_page)
+        setLastPage(page.last_page)
+        settotal_page(page.total)
+        setper_page(page.per_page)
+        setProducts(response.data.data);
+        setTotalProducts(response.data.data)
         setIsData(true);
-        console.log(totalproducts);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const searchProducts = async (searchTerm) => {
+  const searchProducts = async (searchTerm,pagenumber) => {
+    setIsSearch(true)
     if (searchTerm !== "") {
+      setSearchTerm(searchTerm)
       try {
-        const response = await axios.get(`/api/searchproducts/${searchTerm}`);
-        if (response.data.length > 0) {
-          setProducts(response.data);
-          console.log(response.data);
+        const response = await axios.get(`/api/searchproducts/${searchTerm}?page=${pagenumber}`);
+        // console.log(response.data)
+        // console.log('length',response.data.data.length)
+        if (response.data.data.length > 0) {
+          // setProducts(response.data);
+          const page = response.data
+          console.log(page)
+          setCurrentPage(page.current_page)
+          setLastPage(page.last_page)
+          settotal_page(page.total)
+          setper_page(page.per_page)
+          setProducts(response.data.data);
+          // setTotalProducts(response.data.data)          
+        }else{
+          setIsData(false)
         }
       } catch (error) {
         console.log(error);
       }
     }else{
-      setProducts([...totalproducts])
+      // setProducts([...totalproducts])
+      getProductsList(1)
     }
   };
 
@@ -121,6 +145,12 @@ export const AuthProvider = ({ children }) => {
         products,
         searchProducts,
         isData,
+        current_page,
+        last_page,
+        per_page,
+        total,
+        isSearch,
+        searchTerm,
       }}
     >
       {children}
